@@ -22,6 +22,7 @@ resource "rundeck_job" "lambda_job" {
     inline_script = <<-EOT
 #!/bin/bash
 echo '${jsonencode(var.options)}' > ${var.lambda_name}_options.json
+EOT
   }
 
 
@@ -30,7 +31,12 @@ echo '${jsonencode(var.options)}' > ${var.lambda_name}_options.json
     inline_script = <<-EOT
 #!/usr/bin/python3
 
+import json
 import boto3
+import os
+
+f = open('${var.lambda_name}_options.json')
+options = json.load(f)
 
 client = boto3.client('lambda')
 response = client.get_function_configuration(
@@ -38,9 +44,15 @@ response = client.get_function_configuration(
 )
 previous_vars =  response['Environment']['Variables']
 
+
+new_vars = {}
+for option in options:
+  value = os.getenv(f'RD_OPTION_{option['name']}')
+  new_vars[option['name']] = value
+
 response = client.update_function_configuration(
     FunctionName='${var.lambda_name}',
-    Environment=dict(Variables)
+    Environment=new_vars
 )
 EOT
   }
