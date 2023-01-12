@@ -17,6 +17,13 @@ resource "rundeck_job" "lambda_job" {
     }
   }
 
+  command {
+    description = "Write options as JSON"
+    inline_script = <<-EOT
+#!/bin/bash
+echo '${jsonencode(var.options)}' > ${var.lambda_name}_options.json
+  }
+
 
   command {
     description   = "Configure and execute the lambda"
@@ -30,8 +37,6 @@ response = client.get_function_configuration(
     FunctionName='${var.lambda_name}'
 )
 previous_vars =  response['Environment']['Variables']
-
-new_vars = ${var.options}
 
 response = client.update_function_configuration(
     FunctionName='${var.lambda_name}',
