@@ -47,8 +47,10 @@ previous_vars =  response['Environment']['Variables']
 
 new_vars = {}
 for option in options:
-  value = os.getenv(f'RD_OPTION_{option['name']}')
+  value = os.getenv(f"RD_OPTION_{option['name']}")
   new_vars[option['name']] = value
+
+print(f'updating with vars: {new_vars}')
 
 response = client.update_function_configuration(
     FunctionName='${var.lambda_name}',
