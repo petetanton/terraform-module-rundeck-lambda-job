@@ -7,7 +7,7 @@ terraform {
       source = "rundeck/rundeck"
     }
     aws = {
-      source = "hasicorp/aws"
+      source = "hashicorp/aws"
     }
   }
 }
